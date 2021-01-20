@@ -64,21 +64,23 @@ module Umlify
     	  proxy_user = ENV["HTTP_PROXY_USER"]
     	  proxy_pass = ENV["HTTP_PROXY_PASS"]
     		connection = Net::HTTP::Proxy(proxy_host, proxy_port, proxy_user, proxy_pass)
-    	end
-      res = connection.post_form(URI("http://yuml.me/diagram/scruffy/class/"), {"dsl_text"=>@diagram.get_dsl})
-      puts res.body
-      url = "http://yuml.me/#{res.body.strip()}"
-      puts url
-      #Net::HTTP.get(URI(url))
-      connection.start("yuml.me", 80) do |http|
-        http.get(URI.decode("/#{res.body}"))        
       end
+      res = connection.post_form(URI("https://yuml.me/diagram/scruffy/class/"), {"dsl_text"=>@diagram.get_dsl})
+      res.body.sub! 'svg', 'png'
+      puts res.body
+      url = "https://yuml.me/#{res.body.strip()}"
+      puts url
+      Net::HTTP.get(URI(url))
+      #connection.start("yuml.me", 443) do |http|
+      #  http.get(URI.decode("/#{res.body}"))        
+      #end
     end
 
     #Saves the diagram to file
     def save_to_file image
       File.open('uml.png', 'wb') do |file|
-        file << image.body
+        #file << image.body
+        file << image
       end if image
     end
 
